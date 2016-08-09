@@ -1,0 +1,27 @@
+{
+  "name": "node-rpi-si4703",
+  "version": "0.0.1",
+  "description": "Node JS wrapper for the rpi-si4703 FM tuner library.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codyrigney92/node-rpi-si4703.git"
+  },
+  "keywords": [
+    "si4703",
+    "rpi",
+    "raspberry",
+    "pi",
+    "fm",
+    "tuner"
+  ],
+  "author": "Cody Rigney",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codyrigney92/node-rpi-si4703/issues"
+  },
+  "homepage": "https://github.com/codyrigney92/node-rpi-si4703#readme"
+}
