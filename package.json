@@ -4,7 +4,8 @@
   "description": "Node JS wrapper for the rpi-si4703 FM tuner library.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "node-gyp configure && node-gyp build"
   },
   "repository": {
     "type": "git",
