@@ -4,7 +4,8 @@
       "target_name": "node-rpi-si4703",
       "cflags!": ['-fno-exceptions -std=c++11'],
       "cflags_cc!": ['-fno-exceptions -std=c++11'],
-      "sources": ["src/node-rpi-si4703.cpp", "src/FMTuner.cpp", "src/FMTuner.h", "src/rpi-si4703/Si4703_Breakout.cpp", "src/rpi-si4703/Si4703_Breakout.h"]
+      "sources": ["src/node-rpi-si4703.cpp", "src/FMTuner.cpp", "src/FMTuner.h", "src/rpi-si4703/Si4703_Breakout.cpp", "src/rpi-si4703/Si4703_Breakout.h"],
+      "libraries": ["-lwiringPi"]
     },
     {
       "target_name": "action_after_build",

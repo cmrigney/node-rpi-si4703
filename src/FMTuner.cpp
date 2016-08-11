@@ -17,6 +17,10 @@ using v8::Array;
 using v8::HandleScope;
 using v8::Undefined;
 
+using namespace std;
+
+Persistent<Function> FMTuner::constructor;
+
 typedef struct _CallbackData
 {
   Persistent<Function> callback;
@@ -39,41 +43,41 @@ Si4703_Breakout *FMTuner::GetRadio() {
 }
 
 #define DEFAULTCALLBACK(ERRMSG) \
-      [](CallbackData *cd, Local<Value> *argv) { \
-      if(cd->resultStatus) { \ 
-        argv[0] = Null(cd->isolate); \ 
-        argv[1] = Null(Number::New(cd->isolate, cd->resultStatus)); \ 
-      } \ 
-      else { \ 
-        argv[0] = Local<Value>::New(cd->isolate, String::NewFromUtf8(cd->isolate, ERRMSG)); \ 
-        argv[1] = Null(cd->isolate); \ 
+    [](CallbackData *cd, Local<Value> *argv) { \
+      if(cd->resultStatus) { \
+        argv[0] = Null(cd->isolate); \
+        argv[1] = Number::New(cd->isolate, cd->resultStatus); \
       } \
+      else { \
+        argv[0] = Local<Value>::New(cd->isolate, String::NewFromUtf8(cd->isolate, ERRMSG)); \
+        argv[1] = Null(cd->isolate); \
       } \
+    }
 
 
-#define BEGINASYNC() \
+#define BEGINASYNC()  \
   uv_work_t *work = new uv_work_t(); \
   CallbackData *cd = new CallbackData(); \
   cd->isolate = isolate; \
   cd->callback.Reset(isolate, cb); \
-  cd->tuner = this; \
+  cd->tuner = this;
 
 
 #define ASYNCBODY(NativeFunc,SetResultArgs)  \
   work->data = cd; \
  \
-  uv_queue_work(uv_default_loop(), work, \ 
+  uv_queue_work(uv_default_loop(), work, \
   [](uv_work_t *work) { \
     CallbackData *cd = (CallbackData *)work->data; \
     NativeFunc(cd);\
   }, \
-  [](uv_work_t *work, int status) { \ \
+  [](uv_work_t *work, int status) { \
       CallbackData *cd = (CallbackData *)work->data; \
       HandleScope handleScope(cd->isolate); \
  \
       const int argc = 2; \
  \
-      Local<Value> argv[argc]; \ 
+      Local<Value> argv[argc]; \
        \
       SetResultArgs(cd, argv); \
  \
@@ -82,7 +86,7 @@ Si4703_Breakout *FMTuner::GetRadio() {
  \
       delete work; \
       delete cd; \
-  }); \
+  });
 
 
 #define DEFAULTWRAP(METHODNAME) \
@@ -103,14 +107,14 @@ void FMTuner::METHODNAME##Wrap(const FunctionCallbackInfo<Value> &args) { \
    \
   FMTuner *tuner = ObjectWrap::Unwrap<FMTuner>(args.Holder()); \
   tuner->METHODNAME(isolate, Local<Function>::Cast(args[0])); \
-} \
+}
 
 
 void FMTuner::PowerOn(Isolate *isolate, v8::Local<v8::Function> cb) {
   BEGINASYNC();
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->resultStatus = cd->tuner->powerOn();
+      cd->resultStatus = cd->tuner->GetRadio()->powerOn();
     },
     DEFAULTCALLBACK("Power on failed")
   );
@@ -122,7 +126,8 @@ void FMTuner::PowerOff(Isolate *isolate, v8::Local<v8::Function> cb) {
   BEGINASYNC();
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->resultStatus = cd->tuner->powerOff();
+      cd->tuner->GetRadio()->powerOff();
+      cd->resultStatus = 1;
     },
     DEFAULTCALLBACK("Power off failed")
   );
@@ -134,7 +139,7 @@ void FMTuner::SeekUp(Isolate *isolate, v8::Local<v8::Function> cb) {
   BEGINASYNC();
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->resultStatus = cd->tuner->seekUp();
+      cd->resultStatus = cd->tuner->GetRadio()->seekUp();
     },
     DEFAULTCALLBACK("Seek up failed")
   );
@@ -146,7 +151,7 @@ void FMTuner::SeekDown(Isolate *isolate, v8::Local<v8::Function> cb) {
   BEGINASYNC();
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->resultStatus = cd->tuner->seekDown();
+      cd->resultStatus = cd->tuner->GetRadio()->seekDown();
     },
     DEFAULTCALLBACK("Seek down failed")
   );
@@ -158,7 +163,7 @@ void FMTuner::GetChannel(Isolate *isolate, v8::Local<v8::Function> cb) {
   BEGINASYNC();
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->resultStatus = cd->tuner->getChannel();
+      cd->resultStatus = cd->tuner->GetRadio()->getChannel();
     },
     DEFAULTCALLBACK("Get channel failed")
   );
@@ -174,7 +179,7 @@ void FMTuner::SetChannel(Isolate *isolate, Local<Number> channel, v8::Local<v8::
 
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->tuner->setChannel(*(int*)(&cd->data[0]));
+      cd->tuner->GetRadio()->setChannel(*(int*)(&cd->data[0]));
       cd->resultStatus = 1;
     },
     DEFAULTCALLBACK("") //doesn't fail
@@ -219,7 +224,7 @@ void FMTuner::SetVolume(Isolate *isolate, Local<Number> volume, v8::Local<v8::Fu
 
   ASYNCBODY(
     [](CallbackData *cd) {
-      cd->tuner->setVolume(*(int*)(&cd->data[0]));
+      cd->tuner->GetRadio()->setVolume(*(int*)(&cd->data[0]));
       cd->resultStatus = 1;
     },
     DEFAULTCALLBACK("") //doesn't fail
@@ -264,7 +269,7 @@ void FMTuner::ReadRDS(Isolate *isolate, Local<Number> timeout, v8::Local<v8::Fun
       int timeout = *(int*)(&cd->data[0]);
       char msg[16];
       msg[0] = '\0';
-      cd->tuner->readRDS(msg, timeout);
+      cd->tuner->GetRadio()->readRDS(msg, timeout);
       strcpy(cd->data, msg);
       cd->resultStatus = 1;
     },

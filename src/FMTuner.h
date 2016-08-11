@@ -3,7 +3,8 @@
 
 #include <node.h>
 #include <node_object_wrap.h>
-#include <string>
+#include <cstring>
+#include <cstdlib>
 #include <uv.h>
 #include "rpi-si4703/Si4703_Breakout.h"
 

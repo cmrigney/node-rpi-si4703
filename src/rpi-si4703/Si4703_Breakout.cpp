@@ -147,7 +147,7 @@ int Si4703_Breakout::si4703_init()
 
         //Setup I2C
         char filename[20];
-        snprintf( filename, 19, "/dev/i2c-%d", piBoardRev() ); //Handle both RPi board revisions
+        snprintf( filename, 19, "/dev/i2c-%d", 1 ); //Handle both RPi board revisions
         if ( (si4703_fd = open(filename, O_RDWR)) < 0 ) { //Open I2C slave device
                 perror(filename);
                 return(FAIL);
