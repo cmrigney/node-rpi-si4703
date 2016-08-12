@@ -39,5 +39,5 @@ All methods have a callback with error as the first parameter and any result as 
  * **seekUp** - Seek radio up
  * **seekDown** - Seek radio down
  * **setVolume** - Set a volume between 0-15.
- * **readRDS** - Read the RDS message for a station. Pass the frequency to read multiplied by 10.
+ * **readRDS** - Read the RDS message for a station. Pass the time out in milliseconds.
 
